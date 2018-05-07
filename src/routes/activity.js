@@ -88,12 +88,12 @@ module.exports = (config, rpc) => {
   router.post('/', (req, res, next) => {
     trace('POST activity', req.body);
 
-    if (!('url' in req.body) || !('pos' in req.body) || !('playing' in req.body)) {
+    if (!('url' in req.body) || !('pos' in req.body)) {
       debug("Bad Request, missing arguments");
       return res.status(400).json({
         code: 400,
         error: 'Bad Request',
-        message: 'Missing url/pos/playing argument.'
+        message: 'Missing url/pos argument.'
       });
     }
 
@@ -116,26 +116,9 @@ module.exports = (config, rpc) => {
     }
     LOCKED = true;
 
-    if (req.body.playing == '0') {
-      debug("Playback paused, clearing activity");
-      rpc.clearActivity()
-      .then(() => {
-        LOCKED = false;
-        res.status(200).json({
-          code: 200,
-          success: 'OK',
-          message: 'Activity cleared due to paused playback'
-        });
-      })
-      .catch((err) => {
-        next(err);
-      });
-      return;
-    }
-
     let last_activity = rpc.getActivity();
     if (last_activity && last_activity.trackURL == req.body.url) {
-      debug('Playback ok, track already sent, updating timestamps only...');
+      debug('track info already sent, updating timestamps only...');
       last_activity.startTimestamp = Math.round(new Date().getTime() / 1000) - req.body.pos;
       last_activity.endTimestamp = last_activity.startTimestamp + Math.round(last_activity.trackDuration / 1000);
 
@@ -156,7 +139,7 @@ module.exports = (config, rpc) => {
       return;
     }
 
-    debug("Playback ok, getting track info...");
+    debug("getting track info...");
     soundcloud.getTrackData(req.body.url)
     .then((track_data) => {
       debug("Track info downloaded successfully.", track_data.id);

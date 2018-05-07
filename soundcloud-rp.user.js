@@ -17,7 +17,11 @@
     var url = "https://soundcloud.com" + document.querySelector(".playbackSoundBadge__titleLink").getAttribute("href"),
       pos = parseInt(document.querySelector(".playbackTimeline__progressWrapper").getAttribute("aria-valuenow"), 10),
       playing = document.querySelector(".playControls__play").classList.contains("playing"),
-      payload = JSON.stringify({url, pos, playing});
+      payload = JSON.stringify({url, pos});
+
+    // don't request when paused
+    if (!playing)
+      return;
 
     var request = new XMLHttpRequest();
 
