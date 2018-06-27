@@ -1,6 +1,6 @@
 {
   "name": "soundcloud-rp",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Adds Discord Rich Presence support to Soundcloud.",
   "main": "src/index.js",
   "dependencies": {
@@ -8,11 +8,13 @@
     "datauri": "^1.1.0",
     "discord-rpc": "github:discordjs/RPC#479b4e5",
     "express": "^4.16.3",
-    "request": "^2.85.0",
-    "request-promise-native": "^1.0.5"
+    "hbs": "^4.0.1",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
-    "nodemon": "^1.17.4"
+    "nodemon": "^1.17.5"
   },
   "scripts": {
     "start": "node bin/soundcloud-rp",
