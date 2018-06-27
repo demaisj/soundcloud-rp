@@ -103,17 +103,17 @@ module.exports = (config, rpc) => {
 
     if (!('url' in request_data) || !('pos' in request_data)) {
       debug("Bad Request, missing arguments");
-      error(new Error('Missing url/pos argument.'));
+      throw new Error('Missing url/pos argument.');
     }
 
     if (!rpc.status) {
       debug("Service Unavailable, rpc not connected");
-      error(new Error('RPC not connected to Discord.'));
+      throw new Error('RPC not connected to Discord.');
     }
 
     if (LOCKED) {
       debug("LOCKED state, we are already updating activity");
-      error(new Error('An activity request is already being processed.'));
+      throw new Error('An activity request is already being processed.');
     }
     LOCKED = true;
 
