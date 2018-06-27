@@ -89,6 +89,8 @@ module.exports = (config, rpc) => {
 
     return new Promise((resolve, reject) => {
 
+    try{
+
     function success() {
       LOCKED = false;
       resolve();
@@ -174,6 +176,11 @@ module.exports = (config, rpc) => {
       .catch(error);
     })
     .catch(error);
+
+    }
+    catch(err) {
+      error(err);
+    }
   });
   };
 };
