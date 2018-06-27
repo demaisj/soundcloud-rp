@@ -16,7 +16,10 @@ module.exports = function(config, io, rpc) {
         socket.emit('activity', true, {});
       })
       .catch((err) => {
-        socket.emit('activity', false, err);
+        socket.emit('activity', false, {
+          error: err.name,
+          message: err.message
+        });
       })
     });
 
