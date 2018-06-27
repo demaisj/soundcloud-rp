@@ -89,7 +89,23 @@ module.exports = (config, rpc) => {
 
     return new Promise((resolve, reject) => {
 
-    try{
+    if (!('url' in request_data) || !('pos' in request_data)) {
+      debug("Bad Request, missing arguments");
+      reject(new Error('Missing url/pos argument.'));
+      return;
+    }
+
+    if (!rpc.status) {
+      debug("Service Unavailable, rpc not connected");
+      reject(new Error('RPC not connected to Discord.'));
+      return;
+    }
+
+    if (LOCKED) {
+      debug("LOCKED state, we are already updating activity");
+      reject(new Error('An activity request is already being processed.'));
+      return;
+    }
 
     function success() {
       LOCKED = false;
@@ -101,20 +117,8 @@ module.exports = (config, rpc) => {
       reject(err);
     }
 
-    if (!('url' in request_data) || !('pos' in request_data)) {
-      debug("Bad Request, missing arguments");
-      throw new Error('Missing url/pos argument.');
-    }
+    try{
 
-    if (!rpc.status) {
-      debug("Service Unavailable, rpc not connected");
-      throw new Error('RPC not connected to Discord.');
-    }
-
-    if (LOCKED) {
-      debug("LOCKED state, we are already updating activity");
-      throw new Error('An activity request is already being processed.');
-    }
     LOCKED = true;
 
     let last_activity = rpc.getActivity();
