@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const socketio = require('socket.io')
 const path = require('path');
 const bodyParser = require('body-parser');
 const debug = require('debug')('soundcloud-rp:server');
@@ -13,6 +15,8 @@ const rpc = require('./rpc')(config);
 
 
 const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -40,4 +44,4 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+module.exports = server;
