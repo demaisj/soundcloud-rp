@@ -17,9 +17,16 @@
     var interval = 10;
 
     function poll_activity() {
-      var url = "https://soundcloud.com" + document.querySelector(".playbackSoundBadge__titleLink").getAttribute("href"),
-        pos = parseInt(document.querySelector(".playbackTimeline__progressWrapper").getAttribute("aria-valuenow"), 10),
-        playing = document.querySelector(".playControls__play").classList.contains("playing");
+      var $title = document.querySelector(".playbackSoundBadge__titleLink"),
+        $progress = document.querySelector(".playbackTimeline__progressWrapper"),
+        $play = document.querySelector(".playControls__play");
+
+      if (!$title || !$progress || !$play)
+        return;
+
+      var url = "https://soundcloud.com" + $title.getAttribute("href"),
+        pos = parseInt($progress.getAttribute("aria-valuenow"), 10),
+        playing = $play.classList.contains("playing");
 
       if (!playing)
         return;
