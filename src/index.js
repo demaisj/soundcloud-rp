@@ -28,6 +28,9 @@ app.set('view engine', 'hbs');
 const client_routes = require('./routes/client');
 
 app.use(client_routes);
+
+const client_protocol = require('./protocols/client')(config, io, rpc);
+
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
