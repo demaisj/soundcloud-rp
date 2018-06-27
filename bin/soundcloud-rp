@@ -4,22 +4,14 @@
  * Module dependencies.
  */
 
-var app = require('../src/');
+var server = require('../src/');
 var debug = require('debug')('soundcloud-rp:server');
-var http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
 var port = normalizePort(process.env.PORT || '7769');
-app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
 
 /**
  * Listen on provided port, locally

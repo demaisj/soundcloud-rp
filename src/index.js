@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const socketio = require('socket.io')
 const path = require('path');
 const bodyParser = require('body-parser');
 const debug = require('debug')('soundcloud-rp:server');
@@ -11,17 +13,23 @@ if (config.soundcloud.ClientID == '{insert soundcloud client_id}')
 
 const rpc = require('./rpc')(config);
 
-const overview = require('./routes/overview')(config, rpc);
-const activity = require('./routes/activity')(config, rpc);
 
 const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(overview);
-app.use(activity);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
+
+const client_routes = require('./routes/client');
+
+app.use(client_routes);
+
+const client_protocol = require('./protocols/client')(config, io, rpc);
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -44,4 +52,4 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+module.exports = server;

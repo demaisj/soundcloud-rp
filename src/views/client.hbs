@@ -1,0 +1,44 @@
+(function(){
+  function load_script(url) {
+    return new Promise(function (resolve, reject){
+      var head = document.getElementsByTagName('head')[0];
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.onload = resolve;
+      script.onerror = reject;
+      script.src = url;
+      head.appendChild(script);
+    })
+  }
+
+  load_script('http://{{host}}/socket.io/socket.io.js')
+  .then(function(){
+    var socket = io.connect('http://{{host}}');
+    var interval = 10;
+
+    function poll_activity() {
+      var $title = document.querySelector(".playbackSoundBadge__titleLink"),
+        $progress = document.querySelector(".playbackTimeline__progressWrapper"),
+        $play = document.querySelector(".playControls__play");
+
+      if (!$title || !$progress || !$play)
+        return;
+
+      var url = "https://soundcloud.com" + $title.getAttribute("href"),
+        pos = parseInt($progress.getAttribute("aria-valuenow"), 10),
+        playing = $play.classList.contains("playing");
+
+      if (!playing)
+        return;
+
+      socket.emit('activity', { url, pos });
+    }
+
+    poll_activity();
+    setInterval(poll_activity, interval * 1000);
+  })
+  .catch(function(err) {
+    console.error('soundcloud-rp', err);
+  });
+
+})();

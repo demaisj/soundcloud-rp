@@ -2,7 +2,8 @@ const { Client } = require('discord-rpc');
 const trace = require('debug')('soundcloud-rp:trace');
 const debug = require('debug')('soundcloud-rp:rpc');
 
-const WAIT_BETWEEN_TRIES = 30;
+const WAIT_BETWEEN_TRIES = 10;
+const TIMEOUT = 10;
 
 module.exports = (config) => {
 
@@ -22,11 +23,10 @@ module.exports = (config) => {
     initRPC() {
       trace("rpc.init");
 
+      this.status = false;
+
       this._rpc.on('ready', () => {
         trace("rpc.event.ready");
-        debug("Connected to discord!");
-
-        this.status = true;
       });
 
       this.connect();
@@ -35,13 +35,23 @@ module.exports = (config) => {
     connect() {
       trace("rpc.connect");
       debug("Connecting to discord...");
-      this.status = false;
 
-      this._rpc.login(this._config.discord.ClientID).catch((err) => {
+      this._rpc.login(this._config.discord.ClientID)
+      .then(() => {
+        trace("rpc.connect.success");
+        debug("Connected to discord!");
+
+        this.status = true;
+      })
+      .catch((err) => {
         trace("rpc.connect.fail");
+        this.status = false;
+
         debug("Failed to connect to discord", err);
         debug(`Trying again in ${WAIT_BETWEEN_TRIES} seconds...`);
-        setTimeout(this.connect, WAIT_BETWEEN_TRIES * 1000);
+        setTimeout(() => {
+          this.connect()
+        }, WAIT_BETWEEN_TRIES * 1000);
       });
     }
 
@@ -49,7 +59,31 @@ module.exports = (config) => {
       trace("rpc.setActivity", data);
 
       this.current_activity = data;
-      return this._rpc.setActivity(data);
+
+      // We need to timeout ourselves, this method doesn't throw any error
+      return new Promise((resolve, reject) => {
+
+        var request_timeout = setTimeout(() => {
+          trace("rpc.setActivity.fail");
+          this.status = false;
+          var err = new Error('RPC timeout.');
+
+          debug("Failed to interact with discord", err);
+          debug(`Reconnecting again in ${WAIT_BETWEEN_TRIES} seconds...`);
+          setTimeout(() => {
+            this.connect()
+          }, WAIT_BETWEEN_TRIES * 1000);
+
+          reject(err);
+        }, TIMEOUT * 1000);
+
+        this._rpc.setActivity(data).then(() => {
+          trace("rpc.setActivity.success");
+
+          clearTimeout(request_timeout);
+          resolve();
+        });
+      });
     }
 
     getActivity() {
@@ -63,7 +97,31 @@ module.exports = (config) => {
 
       this.current_activity = false;
       this.clearActivityTimeout();
-      return this._rpc.clearActivity();
+
+      // We need to timeout ourselves, this method doesn't throw any error
+      return new Promise((resolve, reject) => {
+
+        var request_timeout = setTimeout(() => {
+          trace("rpc.clearActivity.fail");
+          this.status = false;
+          var err = new Error('RPC timeout.');
+
+          debug("Failed to interact with discord", err);
+          debug(`Reconnecting again in ${WAIT_BETWEEN_TRIES} seconds...`);
+          setTimeout(() => {
+            this.connect()
+          }, WAIT_BETWEEN_TRIES * 1000);
+
+          reject(err);
+        }, TIMEOUT * 1000);
+
+        this._rpc.clearActivity().then(() => {
+          trace("rpc.clearActivity.success");
+
+          clearTimeout(request_timeout);
+          resolve();
+        });
+      });
     }
 
     setActivityTimeout(timestamp) {
