@@ -11,8 +11,6 @@ if (config.soundcloud.ClientID == '{insert soundcloud client_id}')
 
 const rpc = require('./rpc')(config);
 
-const overview = require('./routes/overview')(config, rpc);
-const activity = require('./routes/activity')(config, rpc);
 
 const app = express();
 
@@ -20,8 +18,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(overview);
-app.use(activity);
 
 // error handler
 app.use(function(err, req, res, next) {
