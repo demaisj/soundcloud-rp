@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const trace = require('debug')('soundcloud-rp:trace');
 const debug = require('debug')('soundcloud-rp:activity');
 const { MAX_ARTWORK, ARTWORK_TRACK, ARTWORK_ARTIST } = require('../helpers/artwork');
@@ -85,66 +84,59 @@ module.exports = (config, rpc) => {
 
   let LOCKED = false;
 
-  router.post('/', (req, res, next) => {
-    trace('POST activity', req.body);
+  return (request_data) => {
+    trace('activity', request_data);
 
-    if (!('url' in req.body) || !('pos' in req.body)) {
+    return new Promise((resolve, reject) => {
+
+    function success() {
+      LOCKED = false;
+      resolve();
+    }
+
+    function error(err) {
+      LOCKED = false;
+      reject(err);
+    }
+
+    if (!('url' in request_data) || !('pos' in request_data)) {
       debug("Bad Request, missing arguments");
-      return res.status(400).json({
-        code: 400,
-        error: 'Bad Request',
-        message: 'Missing url/pos argument.'
-      });
+      error(new Error('Missing url/pos argument.'));
     }
 
     if (!rpc.status) {
       debug("Service Unavailable, rpc not connected");
-      return res.status(503).json({
-        code: 503,
-        error: 'Service Unavailable',
-        message: 'RPC not connected to Discord.'
-      });
+      error(new Error('RPC not connected to Discord.'));
     }
 
     if (LOCKED) {
       debug("LOCKED state, we are already updating activity");
-      return res.status(429).json({
-        code: 429,
-        error: 'Too Many Requests',
-        message: 'An activity request is already being processed.'
-      });
+      error(new Error('An activity request is already being processed.'));
     }
     LOCKED = true;
 
     let last_activity = rpc.getActivity();
-    if (last_activity && last_activity.trackURL == req.body.url) {
+    if (last_activity && last_activity.trackURL == request_data.url) {
       debug('track info already sent, updating timestamps only...');
-      last_activity.startTimestamp = Math.round(new Date().getTime() / 1000) - req.body.pos;
+      last_activity.startTimestamp = Math.round(new Date().getTime() / 1000) - request_data.pos;
       last_activity.endTimestamp = last_activity.startTimestamp + Math.round(last_activity.trackDuration / 1000);
 
       rpc.setActivity(last_activity)
       .then(() => {
         rpc.setActivityTimeout(last_activity.endTimestamp + WAIT_BEFORE_CLEAR);
 
-        LOCKED = false;
-        res.status(200).json({
-          code: 200,
-          success: 'OK',
-          message: 'Activity updated successfully'
-        });
+        success();
       })
-      .catch((err) => {
-        next(err);
-      });
+      .catch(error);
       return;
     }
 
     debug("getting track info...");
-    soundcloud.getTrackData(req.body.url)
+    soundcloud.getTrackData(request_data.url)
     .then((track_data) => {
       debug("Track info downloaded successfully.", track_data.id);
 
-      let startTimestamp = Math.round(new Date().getTime() / 1000) - req.body.pos,
+      let startTimestamp = Math.round(new Date().getTime() / 1000) - request_data.pos,
         endTimestamp = startTimestamp + Math.round(track_data.duration / 1000);
 
       debug("Processing artwork...");
@@ -166,7 +158,7 @@ module.exports = (config, rpc) => {
           largeImageText: track_data.title,
           smallImageKey: keys[1],
           smallImageText: track_data.user.username,
-          trackURL: req.body.url,
+          trackURL: request_data.url,
           trackDuration: track_data.duration
         };
 
@@ -175,25 +167,13 @@ module.exports = (config, rpc) => {
         .then(() => {
           rpc.setActivityTimeout(endTimestamp + WAIT_BEFORE_CLEAR);
 
-          LOCKED = false;
-          res.status(200).json({
-            code: 200,
-            success: 'OK',
-            message: 'Activity updated successfully'
-          });
+          success();
         })
-        .catch((err) => {
-          next(err);
-        });
+        .catch(error);
       })
-      .catch(next);
+      .catch(error);
     })
-    .catch(next);
-  },
-  (err, req, res, next) => {
-    LOCKED = false;
-    next(err);
+    .catch(error);
   });
-
-  return router;
+  };
 };
