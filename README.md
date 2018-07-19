@@ -30,20 +30,14 @@ Artwork upload is not available by default due to Discord's asset limit (150). I
 You will need to install [nodejs (v10) and npm (v6)](https://nodejs.org/en/download/current/) first. Make sure the `node` & `npm` commands are installed on your **PATH**.
 
 **Server:**
-1. Clone the repository somewhere on your hard drive 
-
-   `git clone https://github.com/demaisj/soundcloud-rp.git`
-   
-   Or [unzip this archive](https://github.com/demaisj/soundcloud-rp/archive/master.zip) if you don't have git installed
+1. Clone the repository somewhere on your hard drive or [unzip this archive](https://github.com/demaisj/soundcloud-rp/archive/master.zip) if you don't have git installed
 2. Open a terminal in the **soundcloud-rp** directory
 3. Install the dependencies with `npm install`
 4. Retrieve your Soundcloud ClientID :
    - Open [Soundcloud](https://soundcloud.com/) then hit Ctrl+Shift+I to open the devtools
    - Go to the **Network** tab
    - Filter by `api-v2.soundcloud.com`
-   - Click on the first result
-   
-      If there is no results, try changing page on Soundcloud to trigger some requests
+   - Click on the first result. If there is no results, try changing page on Soundcloud to trigger some requests
    - Scroll down to the **Query String Parameters** section
    - Look for the **client_id** field and copy the value
    - Paste it in the corresponding field of the `config/default.json` file
