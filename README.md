@@ -27,26 +27,28 @@ Artwork upload is not available by default due to Discord's asset limit (150). I
 
 ## Installation
 
-*Not tested on windows yet.*
-
-You will need to install nodejs (v10) and npm (v6) first.
+You will need to install [nodejs (v10) and npm (v6)](https://nodejs.org/en/download/current/) first. Make sure the `node` & `npm` commands are installed on your **PATH**.
 
 **Server:**
 1. Clone the repository somewhere on your hard drive 
 
    `git clone https://github.com/demaisj/soundcloud-rp.git`
-2. Install the dependencies `npm install`
-3. Start the server `npm run start`
+   
+   Or [unzip this archive](https://github.com/demaisj/soundcloud-rp/archive/master.zip) if you don't have git installed
+2. Open a terminal in the **soundcloud-rp** directory
+3. Install the dependencies with `npm install`
 4. Retrieve your Soundcloud ClientID :
-   - Open Soundcloud then hit Ctrl+Shift+I to open the devtools
-   - Go to the console tab
-   - Paste this snippet and hit enter
-     ```js
-     // this snippet loads the client configuration of soundcloud and extracts the client id
-     webpackJsonp([],[function(e,t,n){e.exports=n(1579)['api-v2'].query.client_id}])
-     ```
-   - Paste the result of this command in the `config/default.json` file
-5. Additionnaly create a systemd service to start the server on bootup
+   - Open [Soundcloud](https://soundcloud.com/) then hit Ctrl+Shift+I to open the devtools
+   - Go to the **Network** tab
+   - Filter by `api-v2.soundcloud.com`
+   - Click on the first result
+   
+      If there is no results, try changing page on Soundcloud to trigger some requests
+   - Scroll down to the **Query String Parameters** section
+   - Look for the **client_id** field and copy the value
+   - Paste it in the corresponding field of the `config/default.json` file
+5. Start the server with `npm run start`
+6. Additionnaly create a systemd service (linux) or startup shortcut (windows) to start the server on bootup
 
 **Browser:**
 1. Install a userscript extension for your browser like [Tampermonkey](https://tampermonkey.net/)
