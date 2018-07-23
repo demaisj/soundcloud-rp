@@ -36,7 +36,7 @@ module.exports = (config) => {
       trace("rpc.connect");
       debug("Connecting to discord...");
 
-      this._rpc.login(this._config.discord.ClientID)
+      this._rpc.login({clientId: this._config.discord.ClientID })
       .then(() => {
         trace("rpc.connect.success");
         debug("Connected to discord!");
