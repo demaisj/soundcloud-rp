@@ -56,12 +56,14 @@ Here is a step by step guide to activate artwork upload:
 2. Go to the [developer interface](https://discordapp.com/developers/applications/me) of Discord
 3. Create a new app, give it a cool name and save it
 4. Paste the Client ID (found in App Details on the top of the page) into the `config/default.json` file
-5. Scroll down and click "*Enable Rich Presence*"
+5. ~~Scroll down and click "*Enable Rich Presence*"~~
 6. Hit save changes just in case
 7. Retrieve your APIKey
    - Hit ctrl+shift+i to open the devtools
-   - Go to application tab
-   - Find Local Storage section
-   - Copy value inside the double-quotes next to the key `token`
-   - Paste it to the `config/default.json` file
+   - Go to the **Network** tab
+   - Filter by `/api/`
+   - Click on the first result. If there is no results, try changing page to trigger some requests
+   - Scroll down to the **Request Headers** section
+   - Look for the **authorization** field and copy the value
+   - Paste it in the corresponding field of the `config/default.json` file (do not forget to wrap it in double quotes as in `"value"`)
 8. Restart your server and it should be ok!
