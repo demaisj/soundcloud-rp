@@ -58,6 +58,17 @@ module.exports = (config) => {
     setActivity(data) {
       trace("rpc.setActivity", data);
 
+      function pad(str) {
+        while (str.length < 2)
+          str += " ";
+        return str;
+      }
+
+      data.details = pad(data.details);
+      data.state = pad(data.state);
+      data.largeImageText = pad(data.largeImageText);
+      data.smallImageText = pad(data.smallImageText);
+
       this.current_activity = data;
 
       // We need to timeout ourselves, this method doesn't throw any error
