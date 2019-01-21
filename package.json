@@ -1,6 +1,6 @@
 {
   "name": "soundcloud-rp",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Adds Discord Rich Presence support to Soundcloud.",
   "main": "src/index.js",
   "dependencies": {
