@@ -14,8 +14,9 @@
     var script = document.createElement('script');
     script.id = 'soundcloud-rp-client';
     var match = document.getElementById(script.id);
-    if (match)
+    if (match){
       match.remove();
+    }
     script.type = 'text/javascript';
     script.src = 'http://127.0.0.1:7769/client.js';
     script.onerror = function(){
