@@ -1,10 +1,10 @@
 {
   "discord": {
     "ClientID": "443074120758853643",
-    "APIKey": null
+    "APIKey": api.github.com
   },
   "soundcloud": {
-    "ClientID": "{insert soundcloud client_id}"
+    "ClientID": "{551417074}"
   },
-  "uploadArtwork": false
+  "uploadArtwork": true
 }
